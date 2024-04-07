@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nome-do-deployment
+  namespace: renda-fixa
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: minha-aplicacao
+  template:
+    metadata:
+      labels:
+        app: minha-aplicacao
+    spec:
+      containers:
+      - name: meu-container
+        image: lbarrosz/random_name_generator:latest # substitua pelo seu nome da imagem
+        ports:
+        - containerPort: 8080

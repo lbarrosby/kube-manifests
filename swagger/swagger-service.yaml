@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: swagger-service
+  namespace: renda-fixa
+spec:
+  selector:
+    app: swagger
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

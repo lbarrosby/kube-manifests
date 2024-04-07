@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swagger-deployment
+  namespace: renda-fixa
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: swagger
+  template:
+    metadata:
+      labels:
+        app: swagger
+    spec:
+      containers:
+      - name: swagger
+        image: swaggerapi/swagger-ui
+        ports:
+        - containerPort: 8080

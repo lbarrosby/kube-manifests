@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rancher-ingress
+  namespace: renda-fixa
+spec:
+  rules:
+  - host: rancher.lbarros.com  # Altere para o seu domínio
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rancher-service  # Corrigido para o nome do serviço correto
+            port:
+              number: 80
