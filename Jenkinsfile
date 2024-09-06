@@ -15,7 +15,7 @@ pipeline {
                     // Muda para o diretório istio
                     dir('istio') {
                         // Aplica a configuração do Istio
-                        sh 'kubectl apply -f istio-installation.yaml'
+                        sh 'ls -la'
                     }
                 }
             }
