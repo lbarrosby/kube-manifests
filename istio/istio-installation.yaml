@@ -1,0 +1,229 @@
+# istio-installation.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: istiod-service-account
+  namespace: istio-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio-sidecar-injector
+  namespace: istio-system
+data:
+  config: |-
+    policy: always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istiod
+  namespace: istio-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istiod
+  template:
+    metadata:
+      labels:
+        app: istiod
+    spec:
+      serviceAccountName: istiod-service-account
+      containers:
+      - name: istiod
+        image: docker.io/istio/pilot:latest
+        ports:
+        - containerPort: 15010
+        - containerPort: 15011
+        - containerPort: 15014
+        - containerPort: 15020
+        - containerPort: 15029
+        - containerPort: 15030
+        - containerPort: 15031
+        - containerPort: 15032
+        volumeMounts:
+        - name: istio-certs
+          mountPath: /etc/istio/certs
+      volumes:
+      - name: istio-certs
+        secret:
+          secretName: istio.default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: istiod
+  namespace: istio-system
+spec:
+  ports:
+  - port: 15010
+    name: http-8080
+  - port: 15011
+    name: https-8443
+  selector:
+    app: istiod
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: istio-ingressgateway
+  namespace: istio-system
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 443
+    targetPort: 443
+    name: https
+  selector:
+    app: istio-ingressgateway
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-ingressgateway
+  namespace: istio-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istio-ingressgateway
+  template:
+    metadata:
+      labels:
+        app: istio-ingressgateway
+    spec:
+      containers:
+      - name: istio-ingressgateway
+        image: docker.io/istio/proxyv2:latest
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        volumeMounts:
+        - name: istio-certs
+          mountPath: /etc/istio/certs
+      volumes:
+      - name: istio-certs
+        secret:
+          secretName: istio.default
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio-galley
+  namespace: istio-system
+data:
+  config: |-
+    # configuration for galley
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-galley
+  namespace: istio-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istio-galley
+  template:
+    metadata:
+      labels:
+        app: istio-galley
+    spec:
+      containers:
+      - name: istio-galley
+        image: docker.io/istio/galley:latest
+        ports:
+        - containerPort: 443
+        volumeMounts:
+        - name: istio-certs
+          mountPath: /etc/istio/certs
+      volumes:
+      - name: istio-certs
+        secret:
+          secretName: istio.default
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio-pilot
+  namespace: istio-system
+data:
+  config: |-
+    # configuration for pilot
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-pilot
+  namespace: istio-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istio-pilot
+  template:
+    metadata:
+      labels:
+        app: istio-pilot
+    spec:
+      containers:
+      - name: istio-pilot
+        image: docker.io/istio/pilot:latest
+        ports:
+        - containerPort: 15010
+        - containerPort: 15011
+        - containerPort: 15014
+        volumeMounts:
+        - name: istio-certs
+          mountPath: /etc/istio/certs
+      volumes:
+      - name: istio-certs
+        secret:
+          secretName: istio.default
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio-cni-config
+  namespace: istio-system
+data:
+  config: |-
+    # configuration for istio-cni
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-cni
+  namespace: istio-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istio-cni
+  template:
+    metadata:
+      labels:
+        app: istio-cni
+    spec:
+      containers:
+      - name: istio-cni
+        image: docker.io/istio/cni:latest
+        ports:
+        - containerPort: 443
+        volumeMounts:
+        - name: istio-certs
+          mountPath: /etc/istio/certs
+      volumes:
+      - name: istio-certs
+        secret:
+          secretName: istio.default
+
