@@ -1,0 +1,14 @@
+pipeline {
+    agent any  // Usa qualquer agente disponível para executar o pipeline
+
+    stages {
+        stage('Saudação') {
+            steps {
+                script {
+                    echo 'Olá, Mundo!'
+                }
+            }
+        }
+    }
+}
+
